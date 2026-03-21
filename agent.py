@@ -56,6 +56,8 @@ class AgentLoop:
         # 初始化LLM
         self.llm_client = LLMClient()
 
+        self.current_skill_context = {}
+
     def _register_tool(self, tool: Tool):
         self.tools[tool.name] = tool
 
@@ -89,7 +91,7 @@ class AgentLoop:
         print_info("Step 1: 启动加载SKILL元数据【Level 1】")
         print_info("=" * 80)
         system_prompt = self._build_system_prompt()
-        print_info(f"system_prompt: \n {system_prompt}")
+        print_info(f"system_prompt:\n{system_prompt}")
         print_info(f"\n[Token 消耗: 约 {len(system_prompt)} 字符（仅元数据）]")
 
         tool_schema = self._get_tool_schema()
@@ -103,7 +105,7 @@ class AgentLoop:
         print_info("=" * 80)
         messages: list[dict] = []
 
-        current_skill_context = {}
+        self.current_skill_context = {}
 
         messages.append({
             "role": "user",
@@ -112,14 +114,14 @@ class AgentLoop:
 
         while True:
 
-            reasoning = self._model_inference(messages)
+            llm_response = self._model_inference(messages)
             print("=" * 80 + ">")
-            print_info(f"LLM result:\n{json.dumps(reasoning, ensure_ascii=False, indent=4)}")
+            print_info(f"LLM result:\n{json.dumps(llm_response, ensure_ascii=False, indent=4)}")
             print("<" + "=" * 80)
 
-            status = reasoning["status"]
+            status = llm_response["status"]
             if status == "failed":
-                error_message = reasoning["error_message"]
+                error_message = llm_response["error_message"]
                 print_info(f"\n{YELLOW}API Error: {error_message}{RESET}\n")
                 # 出错时回滚本轮所有消息到最近的 user 消息
                 while messages and messages[-1]["role"] != "user":
@@ -129,12 +131,12 @@ class AgentLoop:
                 break
 
             # if status == "succeed":
-            content = reasoning["content"]
+            content = llm_response["content"]
             messages.append({"role": "assistant", "content": content})
 
-            stop_reason = reasoning["stop_reason"]
+            stop_reason = llm_response["stop_reason"]
             if stop_reason == "tool_calls":
-                tool_calls = reasoning["tools"]
+                tool_calls = llm_response["tools"]
                 for tool_call in tool_calls:
                     func_name = tool_call["function_name"]
                     arguments = tool_call["arguments"]
@@ -157,7 +159,7 @@ class AgentLoop:
                             base_path = tool_result["base_path"]
                             skill_content = tool_result["content"]
 
-                            current_skill_context = {
+                            self.current_skill_context = {
                                 "skill_name": skill_name,
                                 "base_path": base_path,
                                 "skill_content": skill_content
@@ -176,7 +178,7 @@ class AgentLoop:
                         print_info(f"参数: {arguments}")
                         print_info(f"调用ID: {tool_call_id}")
                         tool = self.tools[func_name]
-                        tool.set_context(current_skill_context)
+                        tool.set_context(self.current_skill_context)
                         tool_result = tool.execute(**arguments)
 
                         print_info(f"工具结果: {tool_result}")
@@ -193,12 +195,12 @@ class AgentLoop:
             elif stop_reason == "stop":
                 if content:
                     print_assistant(content)
-                current_skill_context = {}
+                self.current_skill_context = {}
                 # 跳出内循环, 等待下一次用户输入
                 break
             else:
                 print_info(f"[stop_reason={stop_reason}]")
-                current_skill_context = {}
+                self.current_skill_context = {}
                 if content:
                     print_assistant(content)
                 break
