@@ -1,19 +1,22 @@
 import json
+import os
 
+from dotenv import load_dotenv
 from openai import OpenAI
 
 
 class LLMClient(object):
 
     def __init__(self):
-        base_url = "http://10.162.199.141:30217/v1"  # 邹亚鹏部署
-        # base_url = "http://10.80.10.0:31816/v1" # 端口8001
-        self.client = OpenAI(
-            api_key="",
-            base_url=base_url,
-        )
-        models = self.client.models.list()
-        model_name = models.data[0].id
+
+        load_dotenv()
+        api_key = os.getenv("OPENAI_API_KEY")
+        model_name = os.getenv("MODEL_ID")
+        base_url = os.getenv("BASE_URL")
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
+        # models = self.client.models.list()
+        # model_name = models.data[0].id
+
         print(f"save_model_name : {model_name}")
         self.model_name = model_name
 
@@ -53,6 +56,6 @@ class LLMClient(object):
                 parsed_response["tools"] = tool_list
         else:
             parsed_response["status"] = "failed"
-            parsed_response["error"] = error_msg
+            parsed_response["message"] = error_msg
 
         return parsed_response
