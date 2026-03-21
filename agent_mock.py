@@ -89,11 +89,8 @@ class MockAgent(object):
         print("=" * 80)
 
         # ---------------------------------------------
-        # Level 1 披露 - 系统提示词（仅元数据）
+        # Level 1 启动加载SKILL.md中的元数据
         # ---------------------------------------------
-        # print("-" * 40)
-        # print("\n【Level 1 披露 - 系统提示词片段】")
-        # print("-" * 40)
         print("\n" + "=" * 80)
         print("Step 1: 启动加载 SKILL.md中的元数据【Level 1】")
         print("=" * 80)
@@ -102,12 +99,8 @@ class MockAgent(object):
         print(f"\n[Token 消耗: 约 {len(system_prompt)} 字符（仅元数据）]")
 
         # ---------------------------------------------
-        # Level 2
+        # Level 2 加载SKILL.md
         # ---------------------------------------------
-        # print("-" * 40)
-        # print("\n【Level 2 披露 - 加载完整 SKILL.md】")
-        # print("-" * 40)
-        # Step 2: 模型意图判断（已经注册了 Skill 工具）
         print("\n" + "=" * 80)
         print("Step 2: （模拟）模型基于 SKILL.md 元数据判断意图 【Level 2】")
         print("=" * 80)
@@ -138,6 +131,9 @@ class MockAgent(object):
             readfile_tool = ReadFileTool(self.context)
             self._register_tool(readfile_tool)
 
+            # ---------------------------------------------
+            # Level 3 执行 Skill 指令
+            # ---------------------------------------------
             # Step 4: 执行 Skill 指令。模拟大模型执行 Skill 中的步骤.（通过工具调用）
             print("\n" + "=" * 80)
             print("Step 4: 按 Skill 指令执行【Level 3】")
