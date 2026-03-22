@@ -1,4 +1,4 @@
-# Skill Progressive Disclosure 架构技术报告
+# Skill Progressive Disclosure 代码解析
 
 基于 SkillPD 代码库的实现分析
 
