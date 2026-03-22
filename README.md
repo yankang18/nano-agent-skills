@@ -1,6 +1,6 @@
 # SkillPD
 
-**Skill Progressive Disclosure（SkillPD）** 是一个以教学为目的的小项目。帮助大家更好的理解Progressive Disclosure。
+**Skill Progressive Disclosure（SkillPD）** 是一个以教学为目的的微项目。帮助大家更好的理解Progressive Disclosure。
 
 ## 核心概念
 
