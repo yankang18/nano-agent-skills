@@ -82,7 +82,7 @@ class SkillRegistry:
         for name, skill in self._skills.items():
             lines.append(f"1. **{name}**: {skill.metadata.description}")
 
-        lines.append("\n匹配规则：")
+        lines.append("\n如何使用技能：")
         lines.append("- 使用技能描述判断用户意图，而非仅匹配关键词")
         lines.append("- 只要意图相符，立即调用对应 Skill 工具，不要直接回应")
         lines.append("- 你不需要知道 Skill 的文件路径，只需传递技能名称给 Skill 工具")

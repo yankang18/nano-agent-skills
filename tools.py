@@ -55,7 +55,7 @@ class Tool:
 
 class SkillTool(Tool):
     """
-    Skill 工具 - 渐进披露的关键机制
+    技能（Skill）工具 - 渐进披露的关键机制
     接受技能名称，解析为实际文件路径，返回完整指令内容
     """
 
@@ -81,11 +81,11 @@ class SkillTool(Tool):
         # 返回内容包含 Base Path，用于后续 Level 3 引用解析
         return {
             "status": "succeed",
-            "message": f"Launching skill: {command}",
+            "message": f"启动技能: {command}",
             "command_name": command,
             "base_path": str(skill.base_path),
             "content": skill.content,  # Level 2 披露：完整指令
-            "note": "请按照上述指令执行。如需查阅引用文件（如 references/xxx.md），使用 ReadFile 工具并基于 Base Path 构造路径"
+            "note": "请按照上述技能指令执行。如需查阅引用文件（如 references/xxx.md），使用 ReadFile 工具并基于 Base Path 构造路径"
         }
 
 
@@ -129,7 +129,12 @@ class BashTool(Tool):
     def __init__(self):
         super().__init__(
             name="Bash",
-            description="执行 shell 命令",
+            description="""执行 shell 命令（在 Unix/macOS 上使用 bash，在 Windows 上使用 cmd.exe）。
+使用场景：
+运行技能脚本
+安装依赖
+文件操作
+任何 shell 命令""",
             params={"command": {"type": "string"}, "description": {"type": "string"}},
             required=["command"]
         )
