@@ -40,13 +40,16 @@ class SkillRegistry:
         if not self.skills_dir.exists():
             return
 
+        # 遍历 skills 目标下的所有技能
         for skill_dir in self.skills_dir.iterdir():
             if skill_dir.is_dir():
+                # 寻找技能目录中的 SKILL.md 文件
                 skill_md = skill_dir / "SKILL.md"
                 if skill_md.exists():
-                    self._load_skill_metadata(skill_dir, skill_md)
+                    # 加载 skill 的元数据（name, description）和内容
+                    self._load_skill_metadata_and_content(skill_dir, skill_md)
 
-    def _load_skill_metadata(self, skill_dir: Path, skill_md: Path):
+    def _load_skill_metadata_and_content(self, skill_dir: Path, skill_md: Path):
         """仅解析 YAML frontmatter（约100 tokens）"""
         content = skill_md.read_text(encoding='utf-8')
 

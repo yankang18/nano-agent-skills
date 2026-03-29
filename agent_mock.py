@@ -180,7 +180,7 @@ if __name__ == "__main__":
     # skills_dir = setup_demo_environment()
 
     # 创建 Agent
-    skills_dir = Path.cwd() / ".claude" / "skills" / "code-reviewer"
+    skills_dir = Path.cwd() / ".claude" / "skills"
     registry = SkillRegistry(skills_dir)
     agent = MockAgent(registry)
 

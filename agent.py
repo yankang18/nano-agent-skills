@@ -19,6 +19,7 @@ DIM = "\033[2m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
+working_directory: Path = Path.cwd()
 
 def colored_prompt() -> str:
     return f"{CYAN}{BOLD}You > {RESET}"
@@ -56,7 +57,7 @@ class AgentLoop:
         # 初始化LLM
         self.llm_client = LLMClient()
 
-        self.current_skill_context: Dict[str, Any] = {}  # 当前激活的 Skill 上下文
+        self._reset_agent_context()
 
     def _register_tool(self, tool: Tool):
         self.tools[tool.name] = tool
@@ -67,6 +68,14 @@ class AgentLoop:
 
     def _get_tool_schema(self):
         return [t.to_schema() for t in self.tools.values()]
+
+    def _reset_agent_context(self):
+        self.agent_context: Dict[str, Any] = {
+            "working_directory": working_directory
+        }
+
+    def _set_skill_context(self, skill_context):
+        self.agent_context["skill_context"] = skill_context
 
     def _model_inference(
             self,
@@ -107,11 +116,11 @@ class AgentLoop:
                     base_path = tool_result["base_path"]
                     skill_content = tool_result["content"]
 
-                    self.current_skill_context = {
+                    self._set_skill_context({
                         "skill_name": skill_name,
                         "base_path": base_path,
                         "skill_content": skill_content
-                    }
+                    })
 
                     print_info(f"调用SKILL:")
                     print_info(f"技能名称: {skill_name}")
@@ -126,7 +135,7 @@ class AgentLoop:
                 print_info(f"参数: {arguments}")
                 print_info(f"调用ID: {tool_call_id}")
                 tool = self.tools[func_name]
-                tool.set_context(self.current_skill_context)
+                tool.set_context(self.agent_context)
                 tool_result = tool.execute(**arguments)
 
                 print_info(f"工具结果: {tool_result}")
@@ -169,7 +178,7 @@ class AgentLoop:
                 print(f"{DIM}再见.{RESET}")
                 break
 
-            self.current_skill_context = {}
+            self._reset_agent_context()
 
             print_info("=" * 80)
             print_info(f"用户输入: {user_input}")
@@ -191,7 +200,10 @@ class AgentLoop:
 
                 llm_response = self._model_inference(messages)
                 print("=" * 80 + ">")
-                print_info(f"LLM result:\n{json.dumps(llm_response, ensure_ascii=False, indent=4)}")
+                try:
+                    print_info(f"LLM result:\n{json.dumps(llm_response, ensure_ascii=False, indent=4)}")
+                except:
+                    print_info(f"LLM result: {llm_response}")
                 print("<" + "=" * 80)
 
                 status = llm_response["status"]
@@ -220,16 +232,13 @@ class AgentLoop:
                 elif stop_reason == "stop":
                     if content:
                         print_assistant(content)
-                    self.current_skill_context = {}
                     # 跳出内循环, 等待下一次用户输入
                     break
                 else:
                     print_info(f"[stop_reason={stop_reason}]")
-                    self.current_skill_context = {}
                     if content:
                         print_assistant(content)
                     break
-
 
 if __name__ == "__main__":
     # 设置演示环境
@@ -237,7 +246,7 @@ if __name__ == "__main__":
     # skills_dir = setup_demo_environment()
 
     # 创建 Agent
-    skills_dir = Path.cwd() / ".claude" / "skills" / "code-reviewer"
+    skills_dir = working_directory / ".claude" / "skills"
     registry = SkillRegistry(skills_dir)
     agent = AgentLoop(registry)
 
