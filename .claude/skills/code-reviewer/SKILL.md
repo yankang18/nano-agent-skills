@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: 在代码提交前进行审查，检查潜在bug、性能问题和风格违规。当用户提到"review"、"审查代码"、"检查PR"或要求评估代码质量时触发。
+description: 在代码提交前进行审查，检查潜在bug、性能问题和风格违规。当用户提到"review code"、"review代码"、"审查代码"、"检查PR"或要求评估代码质量时触发。
 author: Claude Code Team
 version: 1.0
 ---
