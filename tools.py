@@ -54,7 +54,7 @@ class SkillTool(Tool):
     def __init__(self, registry: SkillRegistry):
         super().__init__(
             name="Skill",
-            description="加载技能完整指令。参数: {'command': '技能名称'}",
+            description="加载技能（skills）完整指令。参数: {'command': '技能名称'}",
             params={"command": {"type": "string", "description": "技能名称，如 'code-reviewer'"}},
             required=["command"]
         )
